@@ -5,10 +5,10 @@ def main():
     repo = Repositorio()
     print("Cargando Repositorio...")
     time.sleep(3)
-    print("1 -> Hacer un commit\n2 -> Crear rama\n3 -> Cambiar rama\n4 -> Hacer un merge\n5 -> Mostrar ramas\n6 -> Mostrar historial de la rama actual\n0 -> Finalizar")
+    print("\033[32m1 ->\033[0m Hacer un commit\n\033[32m2 ->\033[0m Crear rama\n\033[32m3 ->\033[0m Cambiar rama\n\033[32m4 ->\033[0m Hacer un merge\n\033[32m5 ->\033[0m Mostrar ramas\n\033[32m6 ->\033[0m Mostrar historial de la rama actual\n\033[32m0 ->\033[0m \033[31mFinalizar\033[0m")
     while True:
         try:
-            opcion = int(input(f"\nIndique el numero de su accion ({repo.ramas[repo.index].nombre_rama}): "))
+            opcion = int(input(f"\nIndique el numero de su accion ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"}): "))
             match opcion:
                 case 1:
                     repo.hacer_commit(input("Mensaje del commit: "))
