@@ -5,6 +5,8 @@ def main():
     repo = Repositorio()
     print("Cargando Repositorio...")
     time.sleep(3)
+
+    # Menu de opciones
     print("\033[32m1 ->\033[0m Añadir un archivo")
     print("\033[32m2 ->\033[0m Hacer un commit")
     print("\033[32m3 ->\033[0m Crear rama")
@@ -13,11 +15,15 @@ def main():
     print("\033[32m6 ->\033[0m Mostrar ramas")
     print("\033[32m7 ->\033[0m Mostrar historial de la rama actual")
     print("\033[32m0 ->\033[0m \033[31mFinalizar\033[0m")
+
     while True:
         try:
             opcion = int(input(f"\nIndique el numero de su accion ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"}): "))
             match opcion:
                 case 1:
+                    nombre_archivo = input("Nombre del archivo: ")
+                    contenido = input("Contenido del archivo: ")
+                    repo.agregar_archivo(nombre_archivo, contenido)
                     pass
                 case 2:
                     repo.hacer_commit(input("Mensaje del commit: "))
@@ -56,6 +62,12 @@ def main():
                 case 7:
                     repo.mostrar_historial()
                 case 0:
+                    def imprimir_texto(texto):
+                        for letra in texto:
+                            print(letra, end='', flush=True)
+                            time.sleep(0.1)
+
+                    print(imprimir_texto("Programa finalizado"))
                     break
         except ValueError as e:
             print(f"Error: {e}")
