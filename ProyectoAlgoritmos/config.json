@@ -1,0 +1,10 @@
+{
+  "init": true,
+  "status": true,
+  "log": true,
+  "add": true,
+  "commit": true,
+  "checkout": true,
+  "branch": true,
+  "pr": true
+}
