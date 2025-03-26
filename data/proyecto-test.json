@@ -1,0 +1,148 @@
+{
+  "name": "proyecto-test",
+  "path": "./proyecto-test",
+  "commits": [
+    {
+      "id": "77eaeb756c",
+      "timestamp": "2025-03-26T18:38:38.941802",
+      "author_email": "usuario@example.com",
+      "message": "Commit inicial",
+      "parent_id": null,
+      "files": [
+        {
+          "name": "utils.py",
+          "content": "Contenido simulado para utils.py",
+          "status": "A",
+          "checksum": "34e4bf0062037be9f08627ccdd16fdaa9157a9b3",
+          "path": "utils.py"
+        },
+        {
+          "name": "main.py",
+          "content": "Contenido simulado para main.py",
+          "status": "A",
+          "checksum": "274d4b5220827c077703bc1d0cc8757adabafa8b",
+          "path": "main.py"
+        },
+        {
+          "name": "README.md",
+          "content": "Contenido simulado para README.md",
+          "status": "A",
+          "checksum": "f79971fa412226aa012c15f4ea20a46aee56bb11",
+          "path": "README.md"
+        }
+      ],
+      "branch_name": "main"
+    },
+    {
+      "id": "147f84f7f2",
+      "timestamp": "2025-03-26T18:38:38.945676",
+      "author_email": "usuario@example.com",
+      "message": "A\u00f1adir nueva caracter\u00edstica",
+      "parent_id": "77eaeb756c",
+      "files": [
+        {
+          "name": "feature.py",
+          "content": "Contenido simulado para feature.py",
+          "status": "A",
+          "checksum": "0549e44e70e110401faace578bc3feb479a481cb",
+          "path": "feature.py"
+        }
+      ],
+      "branch_name": "desarrollo"
+    },
+    {
+      "id": "ea652c3425",
+      "timestamp": "2025-03-26T18:47:21.872527",
+      "author_email": "usuario@example.com",
+      "message": "hola",
+      "parent_id": "77eaeb756c",
+      "files": [
+        {
+          "name": "prueba.py",
+          "content": "Contenido simulado para prueba.py",
+          "status": "A",
+          "checksum": "b1fadb691da173567b1703da1db12d2cd8d1cd87",
+          "path": "prueba.py"
+        }
+      ],
+      "branch_name": "main"
+    },
+    {
+      "id": "bf40c5b4f8",
+      "timestamp": "2025-03-26T18:51:08.206398",
+      "author_email": "usuario@example.com",
+      "message": "hola2",
+      "parent_id": "ea652c3425",
+      "files": [
+        {
+          "name": "prueba2.py",
+          "content": "Contenido simulado para prueba2.py",
+          "status": "A",
+          "checksum": "21326134a5f72871d040db6243b9606753e49e21",
+          "path": "prueba2.py"
+        }
+      ],
+      "branch_name": "main"
+    }
+  ],
+  "branches": [
+    {
+      "name": "main",
+      "head_commit_id": "bf40c5b4f8"
+    },
+    {
+      "name": "desarrollo",
+      "head_commit_id": "147f84f7f2"
+    },
+    {
+      "name": "rama2",
+      "head_commit_id": "bf40c5b4f8"
+    }
+  ],
+  "current_branch": "main",
+  "files": {
+    "README.md": {
+      "name": "README.md",
+      "content": "Contenido simulado para README.md",
+      "status": "A",
+      "checksum": "f79971fa412226aa012c15f4ea20a46aee56bb11",
+      "path": "README.md"
+    },
+    "main.py": {
+      "name": "main.py",
+      "content": "Contenido simulado para main.py",
+      "status": "A",
+      "checksum": "274d4b5220827c077703bc1d0cc8757adabafa8b",
+      "path": "main.py"
+    },
+    "utils.py": {
+      "name": "utils.py",
+      "content": "Contenido simulado para utils.py",
+      "status": "A",
+      "checksum": "34e4bf0062037be9f08627ccdd16fdaa9157a9b3",
+      "path": "utils.py"
+    },
+    "feature.py": {
+      "name": "feature.py",
+      "content": "Contenido simulado para feature.py",
+      "status": "A",
+      "checksum": "0549e44e70e110401faace578bc3feb479a481cb",
+      "path": "feature.py"
+    },
+    "prueba.py": {
+      "name": "prueba.py",
+      "content": "Contenido simulado para prueba.py",
+      "status": "A",
+      "checksum": "b1fadb691da173567b1703da1db12d2cd8d1cd87",
+      "path": "prueba.py"
+    },
+    "prueba2.py": {
+      "name": "prueba2.py",
+      "content": "Contenido simulado para prueba2.py",
+      "status": "A",
+      "checksum": "21326134a5f72871d040db6243b9606753e49e21",
+      "path": "prueba2.py"
+    }
+  },
+  "pull_requests": []
+}
