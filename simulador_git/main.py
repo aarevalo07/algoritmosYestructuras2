@@ -7,23 +7,35 @@ def main():
     time.sleep(3)
 
     # Menu de opciones
-    print("\033[32m1 ->\033[0m Añadir un archivo")
-    print("\033[32m2 ->\033[0m Hacer un commit")
-    print("\033[32m3 ->\033[0m Crear rama")
-    print("\033[32m4 ->\033[0m Cambiar rama")
-    print("\033[32m5 ->\033[0m Hacer un merge")
-    print("\033[32m6 ->\033[0m Mostrar ramas")
-    print("\033[32m7 ->\033[0m Mostrar historial de la rama actual")
-    print("\033[32m0 ->\033[0m \033[31mFinalizar\033[0m")
+    def menu():
+        print("\033[32mgit add <archivo> ->\033[0m Añadir un archivo")
+        print("\033[32mgit commit -m <comentario> ->\033[0m Hacer un commit")
+        print("\033[32mgit branch <rama> ->\033[0m Crear rama")
+        print("\033[32mgit checkout <rama> ->\033[0m Cambiar a rama")
+        print("\033[32mgit merge <rama_actual> <rama_union> ->\033[0m Hacer un merge")
+        print("\033[32mgit branch ->\033[0m Mostrar ramas")
+        print("\033[32mgit log ->\033[0m Mostrar historial de la rama actual")
+        print("\033[32mgit help ->\033[0m Mostrar comandos disponibles")
+        print("\033[32msalir, exit, x ->\033[0m \033[31mFinalizar\033[0m")
+    
+    menu()
 
     while True:
         try:
-            opcion = int(input(f"\nIndique el numero de su accion ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"}): "))
-            match opcion:
-                case 1:
-                    nombre_archivo = input("Nombre del archivo: ")
-                    contenido = input("Contenido del archivo: ")
-                    repo.agregar_archivo(nombre_archivo, contenido)
+            comando = int(input(f"\n/Repositorio ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"})\n> "))
+            match comando:
+                case "git add ":
+                    registro = comando.split(" ", 2) # Separar el comando en una lista para verificar si registro
+                    if comando.startswith("git add ."):
+                        # Si el comando es git add . se añaden todos los archivos
+                        print("Agregamos todos los archivos")
+                    elif len(registro[2].split(" ")) > 1:
+                        archivos = registro[2].split(" ")
+                        for archivo in archivos:
+                            # Si el comando es git add <archivo> se añade el archivo
+                            repo.agregar_archivo(nombre_archivo, contenido, "Añadido")
+                    else:
+                        print("No se agrego ningun archivo")
                     pass
                 case 2:
                     repo.hacer_commit(input("Mensaje del commit: "))
@@ -67,7 +79,7 @@ def main():
                             print(letra, end='', flush=True)
                             time.sleep(0.1)
 
-                    print(imprimir_texto("Programa finalizado"))
+                    imprimir_texto("Programa finalizado")
                     break
         except ValueError as e:
             print(f"Error: {e}")

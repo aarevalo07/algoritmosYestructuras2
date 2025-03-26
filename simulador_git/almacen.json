@@ -1,0 +1,131 @@
+{
+    "repositorios": [
+        {
+            "nombre": "repositorio1",
+            "ramas": [
+                {
+                    "nombre": "main",
+                    "commits": [
+                        {
+                            "hash": "1234",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        },
+                        {
+                            "hash": "5678",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        }
+                    ],
+                    "archivos": [
+                        {
+                            "nombre": "archivo",
+                            "contenido": "contenido",
+                            "estado": "Modificado"
+                        },
+                        {
+                            "nombre": "archivo2",
+                            "contenido": "contenido",
+                            "estado": "no añadido"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "rama2",
+                    "commits": [
+                        {
+                            "hash": "1234",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        },
+                        {
+                            "hash": "5678",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        }
+                    ],
+                    "archivos": [
+                        {
+                            "nombre": "archivo",
+                            "contenido": "contenido",
+                            "estado": "Modificado"
+                        },
+                        {
+                            "nombre": "archivo2",
+                            "contenido": "contenido",
+                            "estado": "no añadido"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "nombre": "repositorio2",
+            "ramas": [
+                {
+                    "nombre": "master",
+                    "commits": [
+                        {
+                            "hash": "1233",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        },
+                        {
+                            "hash": "1234",
+                            "mensaje": "mensaje",
+                            "archivos": [
+                                {
+                                    "nombre": "archivo",
+                                    "contenido": "contenido",
+                                    "estado": "Añadido"
+                                }
+                            ]
+                        }
+                    ],
+                    "archivos": [
+                        {
+                            "nombre": "archivo",
+                            "contenido": "contenido",
+                            "estado": "Modificado"
+                        },
+                        {
+                            "nombre": "archivo2",
+                            "contenido": "contenido",
+                            "estado": "no añadido"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
