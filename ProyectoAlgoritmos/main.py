@@ -1,14 +1,3 @@
-"""
-Sistema de Simulación Git
-Universidad José Antonio Paez
-Facultad de Ingeniería
-Escuela de Ingeniería en Computación
-
-Este programa simula un sistema Git utilizando estructuras de datos como
-listas enlazadas, pilas y colas para implementar las funcionalidades básicas
-de un sistema de control de versiones.
-"""
-
 import os
 import json
 import hashlib
