@@ -22,9 +22,9 @@ def main():
 
     while True:
         try:
-            comando = int(input(f"\n/Repositorio ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"})\n> "))
+            comando = input(f"\n/Repositorio ({"\033[32m"+repo.ramas[repo.index].nombre_rama+"\033[0m"})\n> ")
             match comando:
-                case "git add ":
+                case comando.startswith("git add "):
                     registro = comando.split(" ", 2) # Separar el comando en una lista para verificar si registro
                     if comando.startswith("git add ."):
                         # Si el comando es git add . se añaden todos los archivos
@@ -73,7 +73,7 @@ def main():
                     repo.mostrar_ramas()
                 case 7:
                     repo.mostrar_historial()
-                case 0:
+                case ("x", "exit", "salir"):
                     def imprimir_texto(texto):
                         for letra in texto:
                             print(letra, end='', flush=True)
@@ -81,9 +81,15 @@ def main():
 
                     imprimir_texto("Programa finalizado")
                     break
+                case "git help":
+                    menu()
+                case _:
+                    print("Comando no reconocido")
         except ValueError as e:
             print(f"Error: {e}")
 main()
             
 """
+"""
+""" 
 """

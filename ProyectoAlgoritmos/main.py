@@ -18,8 +18,9 @@ import re
 import time
 import random
 
-# Configuración para habilitar/deshabilitar comandos
-CONFIG_FILE = "config.json"
+# Configuración del sistema
+DATA_DIR = "data"  # Directorio para almacenar los archivos JSON
+REPOS_FILE = os.path.join(DATA_DIR, "repositories_index.json")  # Índice de repositorios
 
 class Node:
     """Clase base para nodos en estructuras de datos enlazadas"""
@@ -609,67 +610,52 @@ class GitSystem:
         self.repositories = LinkedList()
         self.current_repository = None
         self.user_email = "usuario@example.com"  # Email por defecto
-        self.commands = self._load_commands()
+        
+        # Asegurar que existe el directorio de datos
+        if not os.path.exists(DATA_DIR):
+            os.makedirs(DATA_DIR)
         
         # Cargar datos si existen
         self._load_data()
     
-    def _load_commands(self) -> Dict[str, bool]:
-        """Carga la configuración de comandos habilitados/deshabilitados"""
-        if os.path.exists(CONFIG_FILE):
-            try:
-                with open(CONFIG_FILE, 'r') as f:
-                    return json.load(f)
-            except:
-                pass
-        
-        # Configuración por defecto (todos los comandos habilitados)
-        return {
-            "init": True,
-            "status": True,
-            "log": True,
-            "add": True,
-            "commit": True,
-            "checkout": True,
-            "branch": True,
-            "pr": True
-        }
-    
-    def _save_commands(self):
-        """Guarda la configuración de comandos"""
-        with open(CONFIG_FILE, 'w') as f:
-            json.dump(self.commands, f, indent=2)
+    def _get_repo_file_path(self, repo_name: str) -> str:
+        """Obtiene la ruta del archivo JSON para un repositorio"""
+        return os.path.join(DATA_DIR, f"{repo_name}.json")
     
     def _load_data(self):
         """Carga los datos del sistema desde archivos JSON"""
-        if os.path.exists("repositories.json"):
+        # Cargar índice de repositorios
+        if os.path.exists(REPOS_FILE):
             try:
-                with open("repositories.json", 'r') as f:
-                    repos_data = json.load(f)
-                    for repo_data in repos_data:
-                        self.repositories.append(Repository.from_dict(repo_data))
+                with open(REPOS_FILE, 'r') as f:
+                    repos_index = json.load(f)
+                    
+                    # Cargar cada repositorio
+                    for repo_name in repos_index:
+                        repo_file = self._get_repo_file_path(repo_name)
+                        if os.path.exists(repo_file):
+                            with open(repo_file, 'r') as repo_f:
+                                repo_data = json.load(repo_f)
+                                self.repositories.append(Repository.from_dict(repo_data))
             except Exception as e:
                 print(f"Error al cargar los datos: {e}")
+        else:
+            # Crear un índice vacío
+            with open(REPOS_FILE, 'w') as f:
+                json.dump([], f)
     
     def _save_data(self):
         """Guarda los datos del sistema en archivos JSON"""
-        repos_data = [repo.to_dict() for repo in self.repositories.to_list()]
-        with open("repositories.json", 'w') as f:
-            json.dump(repos_data, f, indent=2)
-    
-    def is_command_enabled(self, command: str) -> bool:
-        """Verifica si un comando está habilitado"""
-        return self.commands.get(command, False)
-    
-    def enable_command(self, command: str):
-        """Habilita un comando"""
-        self.commands[command] = True
-        self._save_commands()
-    
-    def disable_command(self, command: str):
-        """Deshabilita un comando"""
-        self.commands[command] = False
-        self._save_commands()
+        # Guardar índice de repositorios
+        repos_names = [repo.name for repo in self.repositories.to_list()]
+        with open(REPOS_FILE, 'w') as f:
+            json.dump(repos_names, f, indent=2)
+        
+        # Guardar cada repositorio en su propio archivo
+        for repo in self.repositories.to_list():
+            repo_file = self._get_repo_file_path(repo.name)
+            with open(repo_file, 'w') as f:
+                json.dump(repo.to_dict(), f, indent=2)
     
     def get_repository(self, name: str) -> Optional[Repository]:
         """Obtiene un repositorio por su nombre"""
@@ -716,10 +702,6 @@ class GitSystem:
     
     def execute_command(self, command: str, args: List[str]) -> Any:
         """Ejecuta un comando Git"""
-        if not self.is_command_enabled(command):
-            print(f"El comando '{command}' está deshabilitado.")
-            return None
-        
         # Comandos que no requieren un repositorio actual
         if command == "init":
             if len(args) < 1:
@@ -822,18 +804,59 @@ class GitSystem:
         # Obtener información de la rama actual
         current_branch = repo.get_current_branch()
         
-        return {
+        status = {
             "branch": repo.current_branch,
-            "staged_files": [file.to_dict() for file in staged_files],
-            "modified_files": [file.to_dict() for name, file in repo.files.items() 
+            "staged_files": [file.name for file in staged_files],
+            "modified_files": [name for name, file in repo.files.items() 
                               if file.status == "M" and file not in staged_files],
-            "untracked_files": [file.to_dict() for name, file in repo.files.items() 
+            "untracked_files": [name for name, file in repo.files.items() 
                                if file.status == "A" and file not in staged_files]
         }
+        
+        # Mostrar información de forma simplificada
+        print(f"En rama: {status['branch']}")
+        
+        if staged_files:
+            print("\nCambios a confirmar:")
+            for file in staged_files:
+                print(f"  {file.name} ({file.status})")
+        
+        modified = status["modified_files"]
+        if modified:
+            print("\nCambios no preparados para commit:")
+            for file in modified:
+                print(f"  {file}")
+        
+        untracked = status["untracked_files"]
+        if untracked:
+            print("\nArchivos sin seguimiento:")
+            for file in untracked:
+                print(f"  {file}")
+        
+        if not staged_files and not modified and not untracked:
+            print("Directorio de trabajo limpio")
+        
+        return status
     
     def _git_log(self) -> List[Dict]:
         """Implementa el comando git log"""
         commits = self.current_repository.commits.to_list()
+        
+        if not commits:
+            print("No hay commits en este repositorio.")
+            return []
+        
+        # Mostrar información de forma simplificada
+        print("Historial de commits:")
+        for commit in commits:
+            print(f"Commit: {commit.id}")
+            print(f"Autor: {commit.author_email}")
+            print(f"Fecha: {commit.timestamp.split('T')[0]}")
+            print(f"Mensaje: {commit.message}")
+            if commit.parent_id:
+                print(f"Padre: {commit.parent_id}")
+            print("-" * 40)
+        
         return [commit.to_dict() for commit in commits]
     
     def _git_add(self, file_path: str) -> bool:
@@ -853,6 +876,7 @@ class GitSystem:
         # Guardar los datos
         self._save_data()
         
+        print(f"Archivo '{file_path}' añadido al área de staging.")
         return True
     
     def _git_commit(self, message: str) -> Optional[Dict]:
@@ -867,6 +891,9 @@ class GitSystem:
         # Guardar los datos
         self._save_data()
         
+        print(f"Commit creado: {commit.id}")
+        print(f"Mensaje: {commit.message}")
+        
         return commit.to_dict()
     
     def _git_checkout(self, target: str) -> bool:
@@ -877,9 +904,13 @@ class GitSystem:
         if repo.get_branch(target):
             # Es una rama
             result = repo.checkout_branch(target)
+            if result:
+                print(f"Cambiado a la rama '{target}'")
         else:
             # Intentar como commit
             result = repo.checkout_commit(target)
+            if result:
+                print(f"HEAD está ahora en el commit {target}")
         
         # Guardar los datos
         if result:
@@ -894,6 +925,7 @@ class GitSystem:
         # Guardar los datos
         if result:
             self._save_data()
+            print(f"Rama '{branch_name}' creada.")
         
         return result
     
@@ -912,6 +944,9 @@ class GitSystem:
         # Guardar los datos
         if pr:
             self._save_data()
+            print(f"Pull Request creado: {pr.id}")
+            print(f"Título: {pr.title}")
+            print(f"De '{pr.source_branch}' a '{pr.target_branch}'")
             return pr.to_dict()
         
         return None
@@ -931,7 +966,16 @@ class GitSystem:
         
         for pr in prs:
             if pr.status in result:
-                result[pr.status].append(pr.to_dict())
+                result[pr.status].append(pr.id)
+        
+        # Mostrar información de forma simplificada
+        print("Estado de Pull Requests:")
+        for status, pr_ids in result.items():
+            if pr_ids:
+                print(f"{status.capitalize()}: {', '.join(pr_ids)}")
+        
+        if not any(result.values()):
+            print("No hay pull requests.")
         
         return result
     
@@ -943,6 +987,7 @@ class GitSystem:
         # Guardar los datos
         if result:
             self._save_data()
+            print(f"Pull Request {pr_id} en revisión por {reviewer}.")
         
         return result
     
@@ -953,6 +998,7 @@ class GitSystem:
         # Guardar los datos
         if result:
             self._save_data()
+            print(f"Pull Request {pr_id} aprobado.")
         
         return result
     
@@ -963,6 +1009,7 @@ class GitSystem:
         # Guardar los datos
         if result:
             self._save_data()
+            print(f"Pull Request {pr_id} rechazado.")
         
         return result
     
@@ -980,12 +1027,27 @@ class GitSystem:
         # Guardar los datos
         self._save_data()
         
+        print(f"Pull Request {pr_id} cancelado.")
         return True
     
     def _git_pr_list(self) -> List[Dict]:
         """Implementa el comando git pr list"""
         prs = self.current_repository.pull_requests.to_list()
-        return [pr.to_dict() for pr in prs]
+        
+        if not prs:
+            print("No hay pull requests.")
+            return []
+        
+        # Mostrar información de forma simplificada
+        print("Lista de Pull Requests:")
+        for pr in prs:
+            print(f"ID: {pr.id}")
+            print(f"Título: {pr.title}")
+            print(f"Estado: {pr.status}")
+            print(f"De '{pr.source_branch}' a '{pr.target_branch}'")
+            print("-" * 30)
+        
+        return [{"id": pr.id, "title": pr.title, "status": pr.status} for pr in prs]
     
     def _git_pr_next(self) -> Optional[Dict]:
         """Implementa el comando git pr next"""
@@ -998,7 +1060,8 @@ class GitSystem:
                 # Guardar los datos
                 self._save_data()
                 
-                return pr.to_dict()
+                print(f"Procesando Pull Request {pr.id}: {pr.title}")
+                return {"id": pr.id, "title": pr.title}
         
         print("No hay pull requests pendientes.")
         return None
@@ -1015,6 +1078,7 @@ class GitSystem:
         # Guardar los datos
         self._save_data()
         
+        print(f"Etiqueta '{tag}' añadida al Pull Request {pr_id}.")
         return True
     
     def _git_pr_clear(self) -> bool:
@@ -1025,6 +1089,7 @@ class GitSystem:
         # Guardar los datos
         self._save_data()
         
+        print("Todos los pull requests han sido eliminados.")
         return True
 
 def main():
@@ -1093,24 +1158,6 @@ def main():
             except ValueError as e:
                 print(f"Error: {e}")
             continue
-        elif command == "enable":
-            # Habilitar comando
-            if len(args) < 1:
-                print("Uso: enable <comando>")
-                continue
-            
-            git_system.enable_command(args[0])
-            print(f"Comando '{args[0]}' habilitado.")
-            continue
-        elif command == "disable":
-            # Deshabilitar comando
-            if len(args) < 1:
-                print("Uso: disable <comando>")
-                continue
-            
-            git_system.disable_command(args[0])
-            print(f"Comando '{args[0]}' deshabilitado.")
-            continue
         elif command == "help":
             # Mostrar ayuda
             _show_help()
@@ -1118,51 +1165,9 @@ def main():
         
         # Ejecutar comando Git
         try:
-            result = git_system.execute_command(command, args)
-            
-            # Mostrar resultado
-            if result is not None:
-                if isinstance(result, dict):
-                    _print_dict(result)
-                elif isinstance(result, list):
-                    _print_list(result)
-                elif isinstance(result, bool):
-                    if result:
-                        print("Operación completada con éxito.")
-                    else:
-                        print("La operación no se pudo completar.")
-                else:
-                    print(result)
+            git_system.execute_command(command, args)
         except Exception as e:
             print(f"Error: {e}")
-
-def _print_dict(data, indent=0):
-    """Imprime un diccionario de forma legible"""
-    for key, value in data.items():
-        if isinstance(value, dict):
-            print(" " * indent + f"{key}:")
-            _print_dict(value, indent + 2)
-        elif isinstance(value, list):
-            print(" " * indent + f"{key}:")
-            _print_list(value, indent + 2)
-        else:
-            print(" " * indent + f"{key}: {value}")
-
-def _print_list(data, indent=0):
-    """Imprime una lista de forma legible"""
-    if not data:
-        print(" " * indent + "(vacío)")
-        return
-    
-    for i, item in enumerate(data):
-        if isinstance(item, dict):
-            print(" " * indent + f"[{i}]:")
-            _print_dict(item, indent + 2)
-        elif isinstance(item, list):
-            print(" " * indent + f"[{i}]:")
-            _print_list(item, indent + 2)
-        else:
-            print(" " * indent + f"[{i}]: {item}")
 
 def _show_help():
     """Muestra la ayuda del programa"""
@@ -1172,8 +1177,6 @@ def _show_help():
     print("  repos                  - Lista los repositorios disponibles")
     print("  use <repo>             - Selecciona un repositorio")
     print("  email [nuevo_email]    - Muestra o establece el email del usuario")
-    print("  enable <comando>       - Habilita un comando Git")
-    print("  disable <comando>      - Deshabilita un comando Git")
     print("  help                   - Muestra esta ayuda")
     print("  exit, quit, q          - Sale del programa")
     
